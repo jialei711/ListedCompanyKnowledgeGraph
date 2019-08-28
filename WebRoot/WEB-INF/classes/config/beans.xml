@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:context="http://www.springframework.org/schema/context" 
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+	    <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+	    <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/other?useUnicode=true&amp;characterEncoding=UTF-8"/>
+	    <property name="user" value="root"/>
+	    <property name="password" value="root"/>
+	    <property name="initialPoolSize" value="5"></property>
+	    <property name="minPoolSize" value="5"></property>
+	    <property name="maxPoolSize" value="15"/>
+	    <property name="checkoutTimeout" value="1000"/> 	
+    </bean>
+
+	<!-- 配置sessionfactory -->
+	<bean id="sessionFactory"  class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+	     <property name="dataSource" ref="dataSource"/>
+	     <property name="hibernateProperties">
+		    <value>
+		        hibernate.dialect=org.hibernate.dialect.MySQLDialect
+		        hibernate.hbm2ddl.auto=update
+		        hibernate.show_sql=false
+		        hibernate.format_sql=false
+		     </value>
+		  </property>
+		     
+	     <!-- 映射文件 -->  
+         <property name="mappingResources">
+			    <list>
+			      <value>com/demo/bean/Stock.hbm.xml</value>
+			      <value>com/demo/bean/Executive.hbm.xml</value>
+			      <value>com/demo/bean/Concept.hbm.xml</value>
+			      <value>com/demo/bean/Industry.hbm.xml</value>
+			      <value>com/demo/bean/ExecutiveToStock.hbm.xml</value>
+			      <value>com/demo/bean/StockToConcept.hbm.xml</value>
+			      <value>com/demo/bean/StockToIndustry.hbm.xml</value>
+			    </list>
+		 </property>
+	</bean>
+     
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+         <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+	<!-- 自动扫描(自动注入) -->
+    <context:component-scan base-package="com.demo" />
+
+    <!-- service配置 -->
+    <bean id="stockService" class="com.demo.service.impl.StockServiceImpl"/>
+    <bean id="executiveService" class="com.demo.service.impl.ExecutiveServiceImpl"/>
+    <bean id="conceptService" class="com.demo.service.impl.ConceptServiceImpl"/>
+    <bean id="industryService" class="com.demo.service.impl.IndustryServiceImpl"/>
+    <bean id="executiveToStockService" class="com.demo.service.impl.ExecutiveToStockServiceImpl"/>
+    <bean id="stockToConceptService" class="com.demo.service.impl.StockToConceptServiceImpl"/>
+    <bean id="stockToIndustryService" class="com.demo.service.impl.StockToIndustryServiceImpl"/>
+    
+
+</beans>
